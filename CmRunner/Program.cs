@@ -54,7 +54,9 @@ internal class Program
       throw new ToolException("Asm error");
     var link = Path.Combine(ToolDir, "link.exe");
     var sw = File.CreateText(Path.Combine(workDir, "link.txt"));
-    sw.WriteLine("/debug"); sw.WriteLine("/ENTRY:main");
+    sw.WriteLine(@"/debug
+/ENTRY:Main
+/SUBSYSTEM:Console");
     sw.WriteLine($"/LIBPATH:\"{LibDir}\"");
     sw.WriteLine($"kernel32.lib");
     sw.WriteLine($"{fileName}.obj");
@@ -70,7 +72,7 @@ internal class Program
   static void Main(string[] args)
   {
     Console.WriteLine("CMoll runner");
-    var fn = @"C:\Code\AsmTest\t\t3_1.asm";
+    var fn = @"C:\Code\CMoll\AsmTestFiles\Minimal.asm";
     var fnBase = Path.GetFileNameWithoutExtension(fn);
     string outDir = @$"R:\{fnBase}";
     if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);

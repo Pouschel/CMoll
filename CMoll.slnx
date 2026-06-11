@@ -1,3 +1,8 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="CMollCompiler/CMollCompiler.csproj" Id="09a67d1e-da64-4e4e-b738-c06e9dd40856" />
+  <Project Path="CMollVm/CMollVm.csproj" Id="83f22504-2296-4705-a42b-d5d4c8524592" />
   <Project Path="CmRunner/CmRunner.csproj" Id="1cf399ba-32d7-44b2-ba28-ceab0da29a5e" />
 </Solution>

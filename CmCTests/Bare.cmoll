@@ -1,0 +1,15 @@
+module bare
+
+impl
+
+main() 
+{ 
+  print("Hallo") 
+}
+
+print(s) :-
+  _cs_("Console.Writeln(<<s>>);")
+
+//? Hallo
+
+

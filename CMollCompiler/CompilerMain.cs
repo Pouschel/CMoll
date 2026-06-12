@@ -1,4 +1,6 @@
-﻿namespace CMoll.Compiler;
+﻿using CsHelper;
+
+namespace CMoll.Compiler;
 
 /// <summary>
 /// Compiler options

@@ -1,13 +1,19 @@
 ﻿
 
-using System;
+
+using CMoll.Compiler;
 
 class Program
 {
   static void Main(string[] args)
   {
-    var fn = @"C:\Users\ts\Documents\Programmierunterstützung\bin\RunHelloDebug.dll";
-    var retval= CsRunner.RunEntryPoint(fn, true);
+    var opt = new CmcOptions()
+    {
+      OutputDir=@"R:\CmcTest",
+      SourceFile="a.cmoll"
+    };
+    CmcMain.CompileAndRun(opt);
+
   }
 }
 

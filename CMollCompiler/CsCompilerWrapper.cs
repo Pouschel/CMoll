@@ -26,6 +26,7 @@ class CsCompilerWrapper
     var references = BuildMetadataReferences(options.ReferenceFiles);
     var compilationOptions = new CSharpCompilationOptions(
         options.Kind,
+        mainTypeName: options.MainTypeName,
         optimizationLevel: options.Release ? OptimizationLevel.Release : OptimizationLevel.Debug);
 
     var compilation = CSharpCompilation.Create(
@@ -233,6 +234,7 @@ internal sealed class CsCompilerOptions
   public bool DebugSymbols { get; set; }
   public bool IsValid { get; private set; }
 
+  public string MainTypeName { get; set; } = "Program";
   public static CsCompilerOptions Parse(string[] args)
   {
     var options = new CsCompilerOptions();

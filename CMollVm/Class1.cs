@@ -1,26 +1,14 @@
-﻿namespace CMollVm;
+﻿
 
-public struct Reg
+using System;
+
+public static class Program
 {
-  public long IVal;
-  public string SVal;
-
-}
-
-public class VM
-{
-  public Reg[] Regs;
-
-  public List<long> IMem = [];
-  public List<string> SMem = [];
-
-  public List<Reg> Stack = [];
-  public VM()
+  public static int Main()
   {
-    Regs = new Reg[8];
+    Console.WriteLine($"Program executed!");
+    return 7;
   }
-
-  // mov ir0 #32
-  // data ivals: 8 7 5
-  // mov ir1 ivals[1]
 }
+
+

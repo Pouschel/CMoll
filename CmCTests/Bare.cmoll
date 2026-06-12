@@ -1,6 +1,6 @@
-module bare
+#module bare
 
-impl
+#impl
 
 main() 
 { 

@@ -1,4 +1,6 @@
-﻿using CsHelper;
+﻿using Cmoll.Compiler.Parsing;
+using Cmoll.Compiler.Scanning;
+using CsHelper;
 
 namespace CMoll.Compiler;
 
@@ -11,11 +13,15 @@ public class CmcOptions
 
   public string OutputDir = ".";
 
+  public TextWriter ErrorWriter = Console.Out;
+
 }
 
 public class CmcResult
 {
   public List<string> CsFiles = [];
+
+
 }
 
 public enum CmcErrorNumbers
@@ -43,6 +49,11 @@ public class CmcMain
 
   static CmcResult CmollToCs(CmcOptions options)
   {
+    var source = File.ReadAllText(options.SourceFile);
+    var scanner = new Scanner(source, options.SourceFile);
+    var tokens = scanner.ScanAllTokens();
+    var parser = new Parser(options, tokens);
+
     var result = new CmcResult();
     var fakeCode = @"
 using System;

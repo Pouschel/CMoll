@@ -53,44 +53,42 @@ interface IEvalExpr
   int Eval();
 }
 
-class FuncExpr<V>
-{
-  Func<V> func;
-
-  public FuncExpr(Func<V> func)
-  {
-    this.func = func;
-  }
-
-  public V Call() => func();
-
-}
-
-class EvalExpr : IEvalExpr
-{
-  public EvalExpr(Func<int> eval)
-  {
-    _eval = eval;
-  }
-  Func<int> _eval;
-
-  public int Eval() => _eval();
-}
-
 class EvalAlgebra : IntAlg<IEvalExpr>
 {
-  public IEvalExpr lit(int n) => new EvalExpr(() => n);
+  public IEvalExpr add(IEvalExpr e1, IEvalExpr e2) => new Add(e1, e2);
+  public IEvalExpr lit(int x) => new Lit(x);
 
-  public IEvalExpr add(IEvalExpr a, IEvalExpr b) => new EvalExpr(() => a.Eval() + b.Eval());
+  record Lit(int v) : IEvalExpr
+  {
+    public int Eval() => v;
+  }
+  record Add(IEvalExpr a, IEvalExpr b) : IEvalExpr
+  {
+    public int Eval() => a.Eval() + b.Eval();
+  }
 }
 
-class IntPrint : IntAlg<FuncExpr<string>>
+interface IPrint
 {
-  public FuncExpr<string> add(FuncExpr<string> e1, FuncExpr<string> e2) 
-    => new(() => e1.Call() + "+" + e2.Call());
-  public FuncExpr<string> lit(int x) => new(() => x.ToString());
+  string print();
 }
 
+
+class IntPrint : IntAlg<IPrint>
+{
+  public IPrint add(IPrint e1, IPrint e2) => new Add(e1, e2);
+  public IPrint lit(int x) => new Lit(x);
+
+  record Lit(int x) : IPrint
+  {
+    public string print() => x.ToString();
+  }
+
+  record Add(IPrint a, IPrint b) : IPrint
+  {
+    public string print() => a.print() + "+" + b.print();
+  }
+}
 
 
 public class TMain
@@ -102,7 +100,7 @@ public class TMain
     EvalAlgebra evAlg = new();
     IntPrint print = new();
     int x = make3Plus5(evAlg).Eval(); // int x = exp.eval();
-    String s = make3Plus5(print).Call();
+    String s = make3Plus5(print).print();
     Console.WriteLine(s);
 
   }

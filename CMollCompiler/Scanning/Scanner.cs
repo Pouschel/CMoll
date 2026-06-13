@@ -56,7 +56,7 @@ internal ref struct Scanner
   Token CheckInvalidOpToken(Token token)
   {
     var tt = token.Type;
-    if (tt <= TokenSemicolon || tt >= TokenIdentifier) return token;
+    if (tt <= TokenSemicolon || tt >= TokenName) return token;
     var txt = token.StringValue;
     while (true)
     {
@@ -107,7 +107,7 @@ internal ref struct Scanner
   {
     while (IsAlpha(Peek()) || IsDigit(Peek()))
       Advance();
-    return MakeToken(TokenIdentifier);
+    return MakeToken(TokenName);
   }
   Token ScanString()
   {

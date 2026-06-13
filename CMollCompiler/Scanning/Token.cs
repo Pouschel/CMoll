@@ -26,7 +26,7 @@ public enum TokenType
   TokenGreater, TokenGreaterEqual,
   TokenLess, TokenLessEqual,
   // Literals.
-  TokenIdentifier, TokenString, TokenNumber,
+  TokenName, TokenString, TokenNumber,
   
   TokenComment,
   // Error, EOF

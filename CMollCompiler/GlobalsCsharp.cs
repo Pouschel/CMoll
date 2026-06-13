@@ -5,3 +5,4 @@ global using System.Linq;
 global using System.Runtime.InteropServices;
 
 global using static Cmoll.Compiler.Scanning.TokenType;
+global using static Cmoll.Compiler.CmcErrorNumbers;

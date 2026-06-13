@@ -1,7 +1,7 @@
 ﻿
 
 
-using CMoll.Compiler;
+using Cmoll.Compiler;
 
 class Program
 {

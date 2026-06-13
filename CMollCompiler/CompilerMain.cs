@@ -3,7 +3,7 @@ using Cmoll.Compiler.Parsing;
 using Cmoll.Compiler.Scanning;
 using CsHelper;
 
-namespace CMoll.Compiler;
+namespace Cmoll.Compiler;
 
 /// <summary>
 /// Compiler options
@@ -15,7 +15,13 @@ public class CmcOptions
   public string OutputDir = ".";
 
   public TextWriter ErrorWriter = Console.Out;
-
+  public Func<InputStatus, string> InputStatusFormatter = inp => inp.Message;
+  public void WriteCompilerError(in InputStatus status, string message)
+  {
+    var msg = string.IsNullOrEmpty(status.FileName) ? message : $"{InputStatusFormatter(status)}: Cerr: {message}";
+    ErrorWriter.WriteLine(msg);
+    System.Diagnostics.Trace.WriteLine(msg);
+  }
 }
 
 public class CmcResult
@@ -29,16 +35,27 @@ public enum CmcErrorNumbers
 {
   NoErrors = 0,
   Syntax_Error = 1000,
+  Invalid_token,
+  Unexpected_consume, 
   Csharp_compiler_error = 9000,
 }
 
-public class CmcException : Exception
-{
-  public readonly CmcErrorNumbers ErrNo;
 
-  public CmcException(CmcErrorNumbers errNo) : base(errNo.ToString().Replace('_', ' '))
+
+public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) : Exception
+{
+
+  public override string Message => base.Message;
+  
+  public static CmcException Create(CmcErrorNumbers errNo, InputStatus stat, params object[] args)
   {
-    this.ErrNo = errNo;
+    var msgText = errNo switch
+    {
+      Invalid_token => $"Invalid token '{args[0]}' found",
+      Unexpected_consume => $"Expected '{args[0]}' but found '{args[1]}'",
+      _ => errNo.ToString().Replace('_', ' ')
+    };
+    return new(errNo,msgText, stat);
   }
 }
 

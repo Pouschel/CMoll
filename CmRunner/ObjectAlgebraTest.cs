@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using CmRunner;
 
-namespace CmRunner;
+namespace CmRunner.ObjectAlgebra;
 
-class Exp
+record Exp
 {
 }
-class Lit : Exp
+record Lit : Exp
 {
   private int x;
 
@@ -17,7 +17,7 @@ class Lit : Exp
     this.x = x;
   }
 }
-class Add : Exp
+record Add : Exp
 {
   public Add(Exp e1, Exp e2)
   {
@@ -90,6 +90,51 @@ class IntPrint : IntAlg<IPrint>
   }
 }
 
+class Print2 : IntAlg<String>
+{
+  public String lit(int x)
+  {
+    return (x).ToString();
+  }
+  public String add(String e1, String e2)
+  {
+    return e1 + " + " + e2;
+  }
+}
+
+record Bool(bool val) : Exp
+{ }
+
+record Iff(Exp e1, Exp e2, Exp e3) : Exp
+{ }
+
+interface IntBoolAlg<A> : IntAlg<A>
+{
+  A Bool(bool b);
+  A Iff(A e1, A e2, A e3);
+}
+
+class IntBoolFactory : IntFactory, IntBoolAlg<Exp>
+{
+  public Exp Bool(bool b) => new Bool(b);
+  public Exp Iff(Exp e1, Exp e2, Exp e3) => new Iff(e1, e2, e3);
+}
+
+class IntBoolPrint : IntPrint, IntBoolAlg<IPrint>
+{
+  public IPrint Bool(bool b) => new BoolP(b);
+  public IPrint Iff(IPrint e1, IPrint e2, IPrint e3) => throw new NotImplementedException();
+
+  record BoolP(bool b) : IPrint
+  {
+    public string print() => b.ToString();
+  }
+
+  record IffP(IPrint e1, IPrint e2, IPrint e3) : IPrint
+  {
+    public string print() => $"if {e1.print()} then {e2.print()} else {e3.print()}";
+  }
+}
 
 public class TMain
 {
@@ -100,8 +145,11 @@ public class TMain
     EvalAlgebra evAlg = new();
     IntPrint print = new();
     int x = make3Plus5(evAlg).Eval(); // int x = exp.eval();
-    String s = make3Plus5(print).print();
+    string s = make3Plus5(print).print();
     Console.WriteLine(s);
+    Print2 p = new();
+    Console.WriteLine(make3Plus5(p));
+    Console.WriteLine(make3Plus5(new IntBoolPrint()).print());
 
   }
 }

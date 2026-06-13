@@ -67,22 +67,8 @@ internal ref struct Scanner
     }
     if (txt == token.StringValue) return token;
     var msg = $"Ungültiger Operator '{txt}'";
-    token = new()
-    {
-      Type = TokenError,
-      Start = 0,
-      End = msg.Length,
-      Source = msg,
-      Status = new(token.Status.FileName)
-      {
-        LineStart = token.Status.LineStart,
-        ColStart = token.Status.ColStart,
-        LineEnd = line,
-        ColEnd = col
-      }
-    };
+    token = ErrorToken(msg);
     return token;
-
   }
   Token Comment()
   {
@@ -195,9 +181,7 @@ internal ref struct Scanner
     Token token = new()
     {
       Type = type,
-      Start = start,
-      End = current,
-      Source = source,
+      StringValue = source[start..current],
       Status = CreateStatus()
     };
     return token;
@@ -207,9 +191,7 @@ internal ref struct Scanner
     Token token = new()
     {
       Type = TokenError,
-      Start = 0,
-      End = message.Length,
-      Source = message,
+      StringValue = message,
       Status = CreateStatus()
     };
     return token;

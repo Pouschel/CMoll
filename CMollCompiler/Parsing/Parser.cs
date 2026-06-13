@@ -6,6 +6,11 @@ using CMoll.Compiler;
 
 namespace Cmoll.Compiler.Parsing;
 
+record OperatorInfo(string Text, string Spec, int Priority)
+{
+  
+}
+
 internal class Parser
 {
   private CmcOptions options;

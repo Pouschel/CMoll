@@ -40,41 +40,29 @@ internal ref struct Scanner
       ']' => MakeToken(TokenRightBracket),
       ';' => MakeToken(TokenSemicolon),
       ',' => MakeToken(TokenComma),
-      '/' => Match('/') ? Comment() : OperatorOrError(c),
+      '/' => Match('/') ? Comment() : OperatorOrError(),
       '"' => ScanString(),
-      _ => OperatorOrError(c)
+      _ => OpChars.Contains(c) ? OperatorOrError() : ErrorToken($"Unexpected char: '{c}'")
     };
     return tok;
   }
+  static string OpChars = "+-*/=<>!%.";
 
-  Token OperatorOrError(char c)
+  Token OperatorOrError()
   {
     while (true)
     {
-      if (!"+-*/=<>!%.".Contains(c)) break;
+      char c = Peek();
+      if (!OpChars.Contains(c)) break;
       Advance();
     }
-    if (start == current) return ErrorToken($"Unexpected char: '{c}'");
-    return MakeToken(TokenOperator);
+    var tok = MakeToken(TokenOperator);
+    if (!state.OpTable.ContainsOperator(tok.StringValue))
+      tok = ErrorToken($"Invalid operator '{tok.StringValue}'");
+    return tok;
   }
 
-  Token CheckInvalidOpToken(Token token)
-  {
-    var tt = token.Type;
-    if (tt <= TokenSemicolon || tt >= TokenName) return token;
-    var txt = token.StringValue;
-    while (true)
-    {
-      char ch = Peek();
-      if (!"+-*/=<>!%.".Contains(ch)) break;
-      txt += ch;
-      Advance();
-    }
-    if (txt == token.StringValue) return token;
-    var msg = $"Ungültiger Operator '{txt}'";
-    token = ErrorToken(msg);
-    return token;
-  }
+
   Token Comment()
   {
     // A comment goes until the end of the line.

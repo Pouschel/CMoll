@@ -16,9 +16,16 @@ class OperatorTable
   {
     public OpValue? Next;
   }
-
   Dictionary<string, OpValue> data = [];
-
+  public OperatorTable()
+  {
+    Init();
+  }
+  void Init()
+  {
+    Add("*", "yfx", 400);
+    Add("+", "yfx", 500);
+  }
   public void Add(string text, string spec, int prio)
   {
     Debug.Assert(text.Length > 0 && spec.Length >= 2 && spec.Contains('f') && prio > 0);
@@ -38,15 +45,6 @@ class OperatorTable
     }
     return null;
   }
+  internal bool ContainsOperator(string opName) => data.ContainsKey(opName);
 
-
-  public OperatorTable()
-  {
-    Init();
-  }
-  void Init()
-  {
-    Add("*", "yfx", 400);
-    Add("+", "yfx", 500);
-  }
 }

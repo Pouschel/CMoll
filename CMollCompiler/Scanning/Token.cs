@@ -17,14 +17,8 @@ public enum TokenType
   TokenLeftBracket, TokenRightBracket, //[]
   TokenComma, TokenSemicolon,
   // Arithmetic op tokens
-  TokenDot, TokenMinus, TokenPlus,    // . - + 
-  TokenSlash, TokenStar, // / *
-  TokenPercent, // %
-                // Comparison tokens
-  TokenBang, TokenBangEqual, // !, !=
-  TokenEqual, TokenEqualEqual,
-  TokenGreater, TokenGreaterEqual,
-  TokenLess, TokenLessEqual,
+  TokenOperator,
+
   // Literals.
   TokenName, TokenString, TokenNumber,
   

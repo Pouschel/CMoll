@@ -1,4 +1,5 @@
 ﻿using Cmoll.Compiler.Core;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Cmoll.Compiler.Scanning;
 
@@ -39,21 +40,22 @@ internal ref struct Scanner
       ']' => MakeToken(TokenRightBracket),
       ';' => MakeToken(TokenSemicolon),
       ',' => MakeToken(TokenComma),
-      '.' => MakeToken(TokenDot),
-      '-' => MakeToken(TokenMinus),
-      '+' => MakeToken(TokenPlus),
-      '/' => Match('/') ? Comment() : MakeToken(TokenSlash),
-      '*' => MakeToken(TokenStar),
-      '%' => MakeToken(TokenPercent),
-      '!' => MakeToken(Match('=') ? TokenBangEqual : TokenBang),
-      '=' => MakeToken(Match('=') ? TokenEqualEqual : TokenEqual),
-      '<' => MakeToken(Match('=') ? TokenLessEqual : TokenLess),
-      '>' => MakeToken(Match('=') ? TokenGreaterEqual : TokenGreater),
+      '/' => Match('/') ? Comment() : OperatorOrError(c),
       '"' => ScanString(),
-      _ => ErrorToken($"Unerwartetes Zeichen: '{c}'"),
+      _ => OperatorOrError(c)
     };
-    tok = CheckInvalidOpToken(tok);
     return tok;
+  }
+
+  Token OperatorOrError(char c)
+  {
+    while (true)
+    {
+      if (!"+-*/=<>!%.".Contains(c)) break;
+      Advance();
+    }
+    if (start == current) return ErrorToken($"Unexpected char: '{c}'");
+    return MakeToken(TokenOperator);
   }
 
   Token CheckInvalidOpToken(Token token)

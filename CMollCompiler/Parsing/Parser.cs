@@ -59,20 +59,23 @@ internal class Parser
   }
   public Expr Parse()
   {
-    return Term();
+    var (t, p) = Term(null, 0);
+    return t;
   }
 
-  Term Term()
+  (Term, int) Term(Term? lhs, int prio)
   {
     var tok = Peek;
     if (Match(TokenLeftParen))
     {
-      var expr = Term();
+      var (expr, _) = Term(null, 0);
       Consume(TokenRightParen, ")");
       expr.Status = tok.Status.Union(Previous.Status);
-      return expr;
+      return (expr, 1);
     }
-    return null;
+
+
+    return (null, -1);
   }
 
 }

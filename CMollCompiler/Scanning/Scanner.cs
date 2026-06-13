@@ -87,14 +87,16 @@ internal ref struct Scanner
   Token Number()
   {
     while (IsDigit(Peek())) Advance();
+    bool isFloat = false;
     // Look for a fractional part.
     if (Peek() == '.' && IsDigit(Peek(1)))
     {
+      isFloat = true;
       // Consume the ".".
       Advance();
       while (IsDigit(Peek())) Advance();
     }
-    return MakeToken(TokenNumber);
+    return MakeToken(isFloat ? TokenFloat: TokenInt);
   }
   Token Identifier()
   {

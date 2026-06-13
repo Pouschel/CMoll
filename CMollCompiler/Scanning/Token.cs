@@ -20,7 +20,7 @@ public enum TokenType
   TokenOperator,
 
   // Literals.
-  TokenName, TokenString, TokenNumber,
+  TokenName, TokenString, TokenInt, TokenFloat,
   
   TokenComment,
   // Error, EOF

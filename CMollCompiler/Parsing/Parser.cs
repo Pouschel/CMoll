@@ -39,6 +39,9 @@ internal class Parser
     }
     return Previous;
   }
+
+  CmcException CreateTokenException(CmcErrorNumbers errno, Token tok)
+    => CmcException.Create(errno, tok.Status, tok.StringValue);
   private bool Match(params TokenType[] types)
   {
     foreach (TokenType type in types)
@@ -59,41 +62,38 @@ internal class Parser
   }
   public Expr Parse()
   {
-    var (t, p) = Term(null, 0);
+    var t = Term();
     return t;
   }
 
-  (Term, int) Term(Term? lhs, int prio)
+  Term Term()
   {
     var tok = Peek;
     if (Match(TokenLeftParen))
     {
-      var (expr, _) = Term(null, 0);
+      var expr = Term();
       Consume(TokenRightParen, ")");
       expr.Status = tok.Status.Union(Previous.Status);
-      return (expr, 1);
+      return TermRhs(expr);
     }
+    if (Match(TokenInt)) return TermRhs(new Number(tok.StringValue, new(typeof(int))));
+    if (Match(TokenFloat)) return TermRhs(new Number(tok.StringValue, new(typeof(double))));
+    throw CreateTokenException(Unexpected_term_token, tok);
 
+  }
 
-    return (null, -1);
+  Term TermRhs(Term lhs)
+  {
+    var tok = Peek;
+    if (tok.Type != TokenOperator) return lhs;
+    var op = state.OpTable.GetRhsOperator(tok.StringValue);
+    // this should an error, because we have no operators of the form xf or yf
+    if (op == null || op.Arity == 1) throw CreateTokenException(Invalid_token, tok);
+    var rhs = Term();
+    return new OpTerm(op, lhs, rhs) { Prio = op.Priority };
   }
 
 }
 
-abstract record Expr
-{
-  public InputStatus Status = InputStatus.Empty;
-  public override string ToString()
-    => Status.IsEmpty ? Status.ReadPartialText() : $"a {this.GetType().Name}";
-}
 
-record Term : Expr
-{ }
 
-record Literal : Term
-{ }
-
-record ModulExpr(string Name) : Expr
-{
-
-}

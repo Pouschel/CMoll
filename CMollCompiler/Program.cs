@@ -22,7 +22,8 @@ class SimpleTests
     var cstate = new CompilerState();
     Scanner scan = new Scanner(cstate, "3+4");
     var tokens = scan.ScanAllTokens();
-
+    var parser = new Parser(cstate, new CmcOptions(), tokens);
+    parser.Parse();
   }
 
 }

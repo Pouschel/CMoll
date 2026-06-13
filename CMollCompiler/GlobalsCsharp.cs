@@ -6,7 +6,7 @@ global using System.Runtime.InteropServices;
 
 global using Cmoll.Compiler.Core;
 global using Cmoll.Compiler.Scanning;
-
+global using Cmoll.Compiler.Parsing;
 
 global using static Cmoll.Compiler.Scanning.TokenType;
 global using static Cmoll.Compiler.CmcErrorNumbers;

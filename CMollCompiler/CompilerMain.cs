@@ -37,6 +37,7 @@ public enum CmcErrorNumbers
   Syntax_Error = 1000,
   Invalid_token,
   Unexpected_consume, 
+  Unexpected_term_token,
   Csharp_compiler_error = 9000,
 }
 
@@ -53,6 +54,8 @@ public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) :
     {
       Invalid_token => $"Invalid token '{args[0]}' found",
       Unexpected_consume => $"Expected '{args[0]}' but found '{args[1]}'",
+      Unexpected_term_token  => $"Unexpected token in term: {args[0]}",
+
       _ => errNo.ToString().Replace('_', ' ')
     };
     return new(errNo,msgText, stat);

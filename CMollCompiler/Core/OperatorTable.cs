@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Cmoll.Compiler.Core;
 
@@ -46,5 +47,16 @@ class OperatorTable
     return null;
   }
   internal bool ContainsOperator(string opName) => data.ContainsKey(opName);
-
+  internal OperatorInfo? GetRhsOperator(string opName)
+  {
+    // situation lhs op ?
+    // this function returs therfore the op iff the f is on pos 1, e.g. xf. yf. 
+    if (!data.TryGetValue(opName, out var ov)) return null;
+    while (ov != null)
+    {
+      if (ov.Op.Spec[1] == 'f') return ov.Op;
+      ov = ov.Next;
+    }
+    return null;
+  }
 }

@@ -1,4 +1,6 @@
-﻿namespace Cmoll.Compiler.Scanning;
+﻿using Cmoll.Compiler.Core;
+
+namespace Cmoll.Compiler.Scanning;
 
 internal ref struct Scanner
 {
@@ -7,9 +9,10 @@ internal ref struct Scanner
   private readonly string fileName;
   private readonly string source;
   int line, col, startLine, startCol;
-
-  public Scanner(string source, string fileName = "")
+  CompilerState state;
+  public Scanner(CompilerState state, string source, string fileName = "")
   {
+    this.state = state;
     this.fileName = fileName;
     this.source = source;
     this.start = this.current = 0;

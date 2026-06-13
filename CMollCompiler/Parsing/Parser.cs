@@ -1,29 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Cmoll.Compiler.Core;
 using Cmoll.Compiler.Scanning;
 using CMoll.Compiler;
 
 namespace Cmoll.Compiler.Parsing;
 
-record OperatorInfo(string Text, string Spec, int Priority)
-{
-  
-}
-
 internal class Parser
 {
   private CmcOptions options;
   private List<Token> tokens;
-
-  public Parser(CmcOptions options, List<Token> tokens)
+  CompilerState state;
+  public Parser(CompilerState state, CmcOptions options, List<Token> tokens)
   {
     this.options = options;
     this.tokens = tokens;
+    this.state = state;
   }
+
+  public ExprBase Parse()
+  {
+    return null;
+  }
+
+
 }
 
-abstract class ExprStmtBase
+abstract record ExprBase
 {
   public InputStatus Status = InputStatus.Empty;
   public override string ToString()

@@ -1,4 +1,5 @@
-﻿using Cmoll.Compiler.Parsing;
+﻿using Cmoll.Compiler.Core;
+using Cmoll.Compiler.Parsing;
 using Cmoll.Compiler.Scanning;
 using CsHelper;
 
@@ -50,9 +51,10 @@ public class CmcMain
   static CmcResult CmollToCs(CmcOptions options)
   {
     var source = File.ReadAllText(options.SourceFile);
-    var scanner = new Scanner(source, options.SourceFile);
+    var cstate = new CompilerState();
+    var scanner = new Scanner(cstate, source, options.SourceFile);
     var tokens = scanner.ScanAllTokens();
-    var parser = new Parser(options, tokens);
+    var parser = new Parser(cstate, options, tokens);
 
     var result = new CmcResult();
     var fakeCode = @"

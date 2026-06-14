@@ -38,6 +38,8 @@ public enum CmcErrorNumbers
   Invalid_token,
   Unexpected_consume, 
   Unexpected_term_token,
+  Term_expected,
+  Malformed_term,
   Csharp_compiler_error = 9000,
 }
 

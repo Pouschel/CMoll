@@ -62,36 +62,62 @@ internal class Parser
   }
   public Expr Parse()
   {
-    var t = Term();
+    var t = SubTermList(";");
     return t;
   }
 
-  Term Term()
+  object SingleTermItem(Token tok)
   {
-    var tok = Peek;
-    if (Match(TokenLeftParen))
-    {
-      var expr = Term();
-      Consume(TokenRightParen, ")");
-      expr.Status = tok.Status.Union(Previous.Status);
-      return TermRhs(expr);
-    }
-    if (Match(TokenInt)) return TermRhs(new Number(tok.StringValue, new(typeof(int))));
-    if (Match(TokenFloat)) return TermRhs(new Number(tok.StringValue, new(typeof(double))));
+    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int)));
+    if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double)));
+    if (Match(TokenOperator)) return tok;
     throw CreateTokenException(Unexpected_term_token, tok);
-
   }
 
-  Term TermRhs(Term lhs)
+  Term SubTermList(string endTermS)
   {
-    var tok = Peek;
-    if (tok.Type != TokenOperator) return lhs;
-    var op = state.OpTable.GetRhsOperator(tok.StringValue);
-    // this should an error, because we have no operators of the form xf or yf
-    if (op == null || op.Arity == 1) throw CreateTokenException(Invalid_token, tok);
-    var rhs = Term();
-    return new OpTerm(op, lhs, rhs) { Prio = op.Priority };
+    List<object> list = new();
+    while (true)
+    {
+      var tok = Peek;
+      if (tok.StringValue == endTermS) break;
+      if (Match(TokenLeftParen))  // () sub term
+      {
+        var pTerm = SubTermList(")");
+        pTerm.Status = tok.Status.Union(CurrentInputStatus);
+        pTerm.Prio = 1;
+        list.Add(pTerm);
+        continue;
+      }
+      var st = SingleTermItem(tok);
+      list.Add(st);
+    }
+    Advance();
+    return BuildTerm(list);
   }
+
+  Term BuildTerm(List<object> list)
+  {
+    // replace op tokens with operator info
+
+
+    while (list.Count > 1)
+      list = ReduceTermList(list);
+    if (list.Count == 0) throw CreateTokenException(Invalid_token, Previous);
+    var item = list[0];
+    if (item is OperatorInfo oi) throw CreateTokenException(Malformed_term, Previous);
+    return (Term)item;
+  }
+
+  List<object> ReduceTermList(List<object> list)
+  {
+    if (list.Count <= 1) return list;
+    var result = new List<object>();
+
+    return result;
+  }
+
+
 
 }
 

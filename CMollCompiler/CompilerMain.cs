@@ -1,7 +1,4 @@
-﻿using Cmoll.Compiler.Core;
-using Cmoll.Compiler.Parsing;
-using Cmoll.Compiler.Scanning;
-using CsHelper;
+﻿using CsHelper;
 
 namespace Cmoll.Compiler;
 
@@ -43,8 +40,6 @@ public enum CmcErrorNumbers
   Invalid_operator,
   Csharp_compiler_error = 9000,
 }
-
-
 
 public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) : Exception
 {

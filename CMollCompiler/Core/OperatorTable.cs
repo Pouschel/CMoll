@@ -15,6 +15,7 @@ class OperatorInfo(string text, int priority)
     MaxPrioArg1 = test.Length == 1 ? int.MaxValue : (test[1] == 'y' ? priority : priority - 1);
   }
   public string Symbol => text;
+  public string SpecString => spec;
   public int Priority => priority;
   public bool IsUnary => Arity == 1;
   public bool IsBinary => Arity == 2;

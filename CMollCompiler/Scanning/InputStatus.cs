@@ -31,6 +31,8 @@ public struct InputStatus
 
   public InputStatus Union(in InputStatus other)
   {
+    if (other.IsEmpty) return this;
+    if (this.IsEmpty) return other;
     var result = this;
     if (result.FileName != this.FileName)
       return new InputStatus();

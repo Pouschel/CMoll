@@ -68,7 +68,7 @@ internal class Parser
 
   object SingleTermItem(Token tok)
   {
-    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status=Previous.Status};
+    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status = Previous.Status };
     if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
     if (Match(TokenOperator)) return tok;
     throw CreateTokenException(Unexpected_term_token, tok);
@@ -129,9 +129,11 @@ internal class Parser
     // check the arg prio
     int a0Prio = arg0!.Prio;
     int a1Prio = arg1?.Prio ?? 1;
-    if (a0Prio > oi.MaxPrioArg0 || a1Prio > oi.MaxPrioArg1) throw CmcException.Create(Malformed_term, arg0.Status.Union(arg1?.Status ?? InputStatus.Empty));
+    var dstStatus = arg0.Status.Union(arg1?.Status ?? InputStatus.Empty);
+    dstStatus = dstStatus.Union(((Token)list[idx]).Status);
+    if (a0Prio > oi.MaxPrioArg0 || a1Prio > oi.MaxPrioArg1) throw CmcException.Create(Malformed_term, dstStatus);
     // build the final Term
-    var ot = new OpTerm(oi, arg0, arg1);
+    var ot = new OpTerm(oi, arg0, arg1) { Status = dstStatus, Prio = oi.Priority };
     result.Add(ot);
     result.AddRange(list[remIndex..]);
     return result;

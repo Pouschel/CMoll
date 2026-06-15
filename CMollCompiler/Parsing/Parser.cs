@@ -98,9 +98,6 @@ internal class Parser
 
   Term BuildTerm(List<object> list)
   {
-    // replace op tokens with operator info
-
-
     while (list.Count > 1)
       list = ReduceTermList(list);
     if (list.Count == 0) throw CreateTokenException(Invalid_token, Previous);
@@ -113,6 +110,15 @@ internal class Parser
   {
     if (list.Count <= 1) return list;
     var result = new List<object>();
+    var (idx, oi) = state.OpTable.FindBestMatchOp(list);
+    if (oi == null) throw CmcException.Create(Malformed_term, CurrentInputStatus);
+    Term? arg0 = null, arg1 = null;
+    if (oi.IsInfix || oi.IsPostfix)
+    {
+      result.AddRange(list[..(idx - 1)]);
+      if (list[idx - 1] is not Term t) throw CmcException.Create(Malformed_term, CurrentInputStatus);
+      arg0 = t;
+    }
 
     return result;
   }

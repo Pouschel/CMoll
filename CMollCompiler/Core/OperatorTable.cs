@@ -8,6 +8,11 @@ record OperatorInfo(string Text, string Spec, int Priority)
   public bool IsUnary => Arity == 1;
   public bool IsBinary => Arity == 2;
   public int Arity => Spec.Length - 1;
+
+  public bool IsInfix => Arity == 2 && Spec[1] == 'f';
+  public bool IsPrefix => Arity == 1 && Spec[0] == 'f';
+  public bool IsPostfix => Arity == 1 && Spec[1] == 'f';
+
 }
 
 
@@ -58,5 +63,45 @@ class OperatorTable
       ov = ov.Next;
     }
     return null;
+  }
+  public (int, OperatorInfo?) FindBestMatchOp(List<object> list)
+  {
+    int minPrio = int.MaxValue;
+    int bestIndex = -1;
+    OperatorInfo? bestOp = null;
+    for (int i = 0; i < list.Count; i++)
+    {
+      if (list[i] is not Token tok) continue;
+      if (!data.TryGetValue(tok.StringValue, out var ov))
+        throw CmcException.Create(Invalid_operator, tok.Status, tok.StringValue);
+      var op = CheckAllowed();
+      if (op?.Priority<minPrio)
+      {
+        minPrio= op.Priority;
+        bestIndex = i;
+        bestOp = op;
+      }
+
+      OperatorInfo? CheckAllowed()
+      {
+        OperatorInfo? resop = null;
+        int minPrio=int.MaxValue;
+        while (ov != null)
+        {
+          var op = ov.Op;
+          if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
+          if (op.IsPrefix && i == list.Count - 1) continue;
+          if (op.IsPostfix && i == 0) continue;
+          if (op.Priority<minPrio)
+          {
+            minPrio= op.Priority;
+            resop = op;
+          }
+          ov = ov.Next;
+        }
+        return resop;
+      }
+    }
+    return (bestIndex, bestOp);
   }
 }

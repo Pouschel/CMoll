@@ -40,6 +40,7 @@ public enum CmcErrorNumbers
   Unexpected_term_token,
   Term_expected,
   Malformed_term,
+  Invalid_operator,
   Csharp_compiler_error = 9000,
 }
 
@@ -57,7 +58,7 @@ public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) :
       Invalid_token => $"Invalid token '{args[0]}' found",
       Unexpected_consume => $"Expected '{args[0]}' but found '{args[1]}'",
       Unexpected_term_token  => $"Unexpected token in term: {args[0]}",
-
+      Invalid_operator =>$"Invalid operator symbol: '{args[0]}'",
       _ => errNo.ToString().Replace('_', ' ')
     };
     return new(errNo,msgText, stat);

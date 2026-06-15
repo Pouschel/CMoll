@@ -44,13 +44,13 @@ public enum CmcErrorNumbers
 public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) : Exception
 {
 
-  public override string Message => base.Message;
+  public override string Message => $"{stat}: error {(int) errNo}: {msg}" ;
   
   public static CmcException Create(CmcErrorNumbers errNo, InputStatus stat, params object[] args)
   {
     var msgText = errNo switch
     {
-      Invalid_token => $"Invalid token '{args[0]}' found",
+      Invalid_token => $"{args[0]}",
       Unexpected_consume => $"Expected '{args[0]}' but found '{args[1]}'",
       Unexpected_term_token  => $"Unexpected token in term: {args[0]}",
       Invalid_operator =>$"Invalid operator symbol: '{args[0]}'",

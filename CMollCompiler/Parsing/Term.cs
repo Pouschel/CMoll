@@ -28,8 +28,8 @@ record Number(string Value) : Term
   {
     this.Type = type;
   }
-
   public override void BuildCoreString(StringBuilder sb) => sb.Append(Value);
+  public override string ToString() => base.ToString();
 }
 
 record OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term

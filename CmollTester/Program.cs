@@ -1,0 +1,24 @@
+﻿global using Cmoll.Compiler.Core;
+global using Cmoll.Compiler.Scanning;
+global using Cmoll.Compiler.Parsing;
+global using Cmoll.Compiler;
+global using Testing.Framework;
+global using static Testing.Framework.Assert;
+
+namespace CmollTester;
+
+internal class Program
+{
+  static void Main(string[] args)
+  {
+    var term= TermTester.CheckOkTerm("(1+2)*3");
+    var s = term?.ToString();
+    
+    Tester.Start();
+    TermTester.TestAllTerms();
+    //Tester.TestAssembly(typeof(Program).Assembly);
+    Tester.End();
+
+
+  }
+}

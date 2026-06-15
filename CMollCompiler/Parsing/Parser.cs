@@ -93,7 +93,9 @@ internal class Parser
       list.Add(st);
     }
     Advance();
-    return BuildTerm(list);
+    var term = BuildTerm(list);
+    term.FixPrio();
+    return term;
   }
 
   Term BuildTerm(List<object> list)

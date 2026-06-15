@@ -16,6 +16,12 @@ record Term : Expr
     BuildCoreString(sb);
     return $"{sb} {Type} {Prio}";
   }
+
+  /// <summary>
+  /// Adapts the priority to the args
+  /// (braces did set it to 1, so we will correct it here)
+  /// </summary>
+  public virtual void FixPrio() { }
 }
 
 record Literal : Term
@@ -58,6 +64,12 @@ record OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
       arg.BuildCoreString(sb);
       if (arg.Prio > cmpPrio) sb.Append(' ');
     }
+  }
+  public override void FixPrio()
+  {
+    arg0.FixPrio(); arg1?.FixPrio();
+    //if (arg0.Prio > this.Prio || arg1?.Prio > this.Prio) throw new NotSupportedException();
+    this.Prio = op.Priority;
   }
 
   public override string ToString() => base.ToString();

@@ -68,13 +68,13 @@ internal class Parser
 
   object SingleTermItem(Token tok)
   {
-    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int)));
-    if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double)));
+    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status=Previous.Status};
+    if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
     if (Match(TokenOperator)) return tok;
     throw CreateTokenException(Unexpected_term_token, tok);
   }
 
-  Term SubTermList(string endTermS)
+  public Term SubTermList(string endTermS)
   {
     List<object> list = new();
     while (true)
@@ -102,8 +102,8 @@ internal class Parser
       list = ReduceTermList(list);
     if (list.Count == 0) throw CreateTokenException(Invalid_token, Previous);
     var item = list[0];
-    if (item is OperatorInfo oi) throw CreateTokenException(Malformed_term, Previous);
-    return (Term)item;
+    if (item is not Term term) throw CreateTokenException(Malformed_term, Previous);
+    return term;
   }
 
   List<object> ReduceTermList(List<object> list)
@@ -119,11 +119,23 @@ internal class Parser
       if (list[idx - 1] is not Term t) throw CmcException.Create(Malformed_term, CurrentInputStatus);
       arg0 = t;
     }
-
+    int remIndex = idx + 1;
+    if (oi.IsInfix || oi.IsPrefix)
+    {
+      if (list[idx + 1] is not Term t) throw CmcException.Create(Malformed_term, CurrentInputStatus);
+      if (arg0 == null) arg0 = t; else arg1 = t;
+      if (oi.IsInfix) remIndex++;
+    }
+    // check the arg prio
+    int a0Prio = arg0!.Prio;
+    int a1Prio = arg1?.Prio ?? 1;
+    if (a0Prio > oi.MaxPrioArg0 || a1Prio > oi.MaxPrioArg1) throw CmcException.Create(Malformed_term, arg0.Status.Union(arg1?.Status ?? InputStatus.Empty));
+    // build the final Term
+    var ot = new OpTerm(oi, arg0, arg1);
+    result.Add(ot);
+    result.AddRange(list[remIndex..]);
     return result;
   }
-
-
 
 }
 

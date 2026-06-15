@@ -3,16 +3,30 @@ using System.Xml.Linq;
 
 namespace Cmoll.Compiler.Core;
 
-record OperatorInfo(string Text, string Spec, int Priority)
+class OperatorInfo(string text, int priority)
 {
+  string spec;
+  public OperatorInfo(string text, string spec, int priority) : this(text, priority)
+  {
+    this.spec = spec;
+    Arity = spec.Length - 1;
+    var test = spec.Replace("f", "");
+    MaxPrioArg0 = test[0] == 'y' ? priority : priority - 1;
+    MaxPrioArg1 = test.Length == 1 ? int.MaxValue : (test[1] == 'y' ? priority : priority - 1);
+  }
+  public string Symbol => text;
+  public int Priority => priority;
   public bool IsUnary => Arity == 1;
   public bool IsBinary => Arity == 2;
-  public int Arity => Spec.Length - 1;
+  public int Arity { get; init; }
+  public int MaxPrioArg0 { get; init; }
+  public int MaxPrioArg1 { get; init; }
 
-  public bool IsInfix => Arity == 2 && Spec[1] == 'f';
-  public bool IsPrefix => Arity == 1 && Spec[0] == 'f';
-  public bool IsPostfix => Arity == 1 && Spec[1] == 'f';
+  public bool IsInfix => Arity == 2 && spec[1] == 'f';
+  public bool IsPrefix => Arity == 1 && spec[0] == 'f';
+  public bool IsPostfix => Arity == 1 && spec[1] == 'f';
 
+  public override string ToString() => $"{Symbol} {spec} {priority}";
 }
 
 
@@ -52,18 +66,6 @@ class OperatorTable
     return null;
   }
   internal bool ContainsOperator(string opName) => data.ContainsKey(opName);
-  internal OperatorInfo? GetRhsOperator(string opName)
-  {
-    // situation lhs op ?
-    // this function returs therfore the op iff the f is on pos 1, e.g. xf. yf. 
-    if (!data.TryGetValue(opName, out var ov)) return null;
-    while (ov != null)
-    {
-      if (ov.Op.Spec[1] == 'f') return ov.Op;
-      ov = ov.Next;
-    }
-    return null;
-  }
   public (int, OperatorInfo?) FindBestMatchOp(List<object> list)
   {
     int minPrio = int.MaxValue;
@@ -75,9 +77,9 @@ class OperatorTable
       if (!data.TryGetValue(tok.StringValue, out var ov))
         throw CmcException.Create(Invalid_operator, tok.Status, tok.StringValue);
       var op = CheckAllowed();
-      if (op?.Priority<minPrio)
+      if (op?.Priority < minPrio)
       {
-        minPrio= op.Priority;
+        minPrio = op.Priority;
         bestIndex = i;
         bestOp = op;
       }
@@ -85,16 +87,16 @@ class OperatorTable
       OperatorInfo? CheckAllowed()
       {
         OperatorInfo? resop = null;
-        int minPrio=int.MaxValue;
+        int minPrio = int.MaxValue;
         while (ov != null)
         {
           var op = ov.Op;
           if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
           if (op.IsPrefix && i == list.Count - 1) continue;
           if (op.IsPostfix && i == 0) continue;
-          if (op.Priority<minPrio)
+          if (op.Priority < minPrio)
           {
-            minPrio= op.Priority;
+            minPrio = op.Priority;
             resop = op;
           }
           ov = ov.Next;

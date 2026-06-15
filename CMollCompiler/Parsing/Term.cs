@@ -60,9 +60,9 @@ record OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
     {
       if (arg == null) return;
       int cmpPrio = xy == 'x' ? Prio + 1 : Prio;
-      if (arg.Prio > cmpPrio) sb.Append(' ');
+      if (arg.Prio > cmpPrio) sb.Append('(');
       arg.BuildCoreString(sb);
-      if (arg.Prio > cmpPrio) sb.Append(' ');
+      if (arg.Prio > cmpPrio) sb.Append(')');
     }
   }
   public override void FixPrio()

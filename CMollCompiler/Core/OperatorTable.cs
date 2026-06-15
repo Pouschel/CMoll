@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace Cmoll.Compiler.Core;
 
-class OperatorInfo(string text, int priority)
+class OperatorInfo(string text, int priority) : IEquatable<OperatorInfo>
 {
   string spec;
   public OperatorInfo(string text, string spec, int priority) : this(text, priority)
@@ -26,6 +26,17 @@ class OperatorInfo(string text, int priority)
   public bool IsInfix => Arity == 2 && spec[1] == 'f';
   public bool IsPrefix => Arity == 1 && spec[0] == 'f';
   public bool IsPostfix => Arity == 1 && spec[1] == 'f';
+
+  public override bool Equals(object? obj) => Equals(obj as OperatorInfo);
+  public override int GetHashCode() => Symbol.GetHashCode() << 3 + Priority + spec.GetHashCode();
+  public bool Equals(OperatorInfo? other)
+  {
+    if (other is null) return false;
+    if (this.Symbol != other.Symbol) return false;
+    if (this.spec != other.spec) return false;
+    if (this.Priority != other.Priority) return false;
+    return true;
+  }
 
   public override string ToString() => $"{Symbol} {spec} {priority}";
 }
@@ -92,15 +103,21 @@ class OperatorTable
         while (ov != null)
         {
           var op = ov.Op;
-          if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
-          if (op.IsPrefix && i == list.Count - 1) continue;
-          if (op.IsPostfix && i == 0) continue;
-          if (op.Priority < minPrio)
+          try
           {
-            minPrio = op.Priority;
-            resop = op;
+            if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
+            if (op.IsPrefix && i == list.Count - 1) continue;
+            if (op.IsPostfix && i == 0) continue;
+            if (op.Priority < minPrio)
+            {
+              minPrio = op.Priority;
+              resop = op;
+            }
           }
-          ov = ov.Next;
+          finally
+          {
+            ov = ov.Next;
+          }
         }
         return resop;
       }

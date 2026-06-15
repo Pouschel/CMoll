@@ -11,7 +11,7 @@ internal class Program
 {
   static void Main(string[] args)
   {
-    var term= TermTester.CheckOkTerm("(1+2)*3");
+    var term= TermTester.CompileOpTerm("1+8");
     var s = term?.ToString();
     
     Tester.Start();

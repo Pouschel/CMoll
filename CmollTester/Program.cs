@@ -13,7 +13,8 @@ internal class Program
   {
     var term= TermTester.CompileOpTerm("1+8");
     var s = term?.ToString();
-    
+    PredCompExperiment.PrintSpf(12);
+
     Tester.Start();
     TermTester.TestAllTerms();
     //Tester.TestAssembly(typeof(Program).Assembly);

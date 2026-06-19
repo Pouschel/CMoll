@@ -83,9 +83,12 @@ internal class Parser
       if (tok.StringValue == endTermS) break;
       if (Match(TokenLeftParen))  // () sub term
       {
-        var pTerm = SubTermList(")");
-        pTerm.Status = tok.Status.Union(CurrentInputStatus);
-        pTerm.Prio = 1;
+        var innerTerm = SubTermList(")");
+        var pTerm = new ParanTerm(innerTerm)
+        {
+          Status = tok.Status.Union(CurrentInputStatus),
+          Prio = 1
+        };
         list.Add(pTerm);
         continue;
       }

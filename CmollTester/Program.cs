@@ -11,9 +11,9 @@ internal class Program
 {
   static void Main(string[] args)
   {
-    var term= TermTester.CompileOpTerm("1+8");
+    var term= TermTester.CompileOpTerm("(1+8)*3");
     var s = term?.ToString();
-    PredCompExperiment.PrintSpf(12);
+    //PredCompExperiment.PrintSpf(12);
 
     Tester.Start();
     TermTester.TestAllTerms();

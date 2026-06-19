@@ -38,6 +38,17 @@ record Number(string Value) : Term
   public override string ToString() => base.ToString();
 }
 
+record ParanTerm(Term inner) :Term
+{
+  public override void BuildCoreString(StringBuilder sb)
+  {
+    sb.Append('(');
+    inner.BuildCoreString(sb);
+    sb.Append(')');
+  }
+  public override string ToString() => base.ToString();
+}
+
 record OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
 {
   public override void BuildCoreString(StringBuilder sb)

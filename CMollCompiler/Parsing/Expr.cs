@@ -9,8 +9,5 @@ abstract record Expr
 
 
 
-record ModulExpr(string Name) : Expr
-{
-}
 
 

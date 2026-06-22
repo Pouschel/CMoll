@@ -14,7 +14,7 @@ class TermTester
 1+
 ";
 
-  public static Term? CompileOpTerm(string termCode, string endTermSymbol = ";")
+  public static Term? CompileOpTerm(string termCode, string endTermSymbol = ".")
   {
     var cstate = new CompilerState();
     Scanner scan = new Scanner(cstate, termCode + endTermSymbol);
@@ -23,7 +23,7 @@ class TermTester
     return parser.SubTermList(endTermSymbol);
   }
 
-  public static Term? CheckOkTerm(string termCode, OperatorInfo expectedOp, string endTermSymbol = ";")
+  public static Term? CheckOkTerm(string termCode, OperatorInfo expectedOp, string endTermSymbol = ".")
   {
     var term = CompileOpTerm(termCode, endTermSymbol)!;
     term.NotNullExpected();
@@ -35,7 +35,7 @@ class TermTester
     return term;
   }
 
-  public static bool CheckErrorTerm(string termCode, string endTermSymbol = ";")
+  public static bool CheckErrorTerm(string termCode, string endTermSymbol = ".")
   {
     Throws<CmcException>(() => CompileOpTerm(termCode,endTermSymbol));
     return true;

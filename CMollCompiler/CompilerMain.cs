@@ -1,4 +1,5 @@
-﻿using CsHelper;
+﻿using System.Diagnostics;
+using CsHelper;
 
 namespace Cmoll.Compiler;
 
@@ -33,7 +34,7 @@ public enum CmcErrorNumbers
   NoErrors = 0,
   Syntax_Error = 1000,
   Invalid_token,
-  Unexpected_consume, 
+  Unexpected_consume,
   Unexpected_term_token,
   Term_expected,
   Malformed_term,
@@ -44,19 +45,21 @@ public enum CmcErrorNumbers
 public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) : Exception
 {
 
-  public override string Message => $"{stat}: error {(int) errNo}: {msg}" ;
-  
+  public override string Message => $"{stat}: error {(int)errNo}: {msg}";
+
   public static CmcException Create(CmcErrorNumbers errNo, InputStatus stat, params object[] args)
   {
     var msgText = errNo switch
     {
       Invalid_token => $"{args[0]}",
       Unexpected_consume => $"Expected '{args[0]}' but found '{args[1]}'",
-      Unexpected_term_token  => $"Unexpected token in term: {args[0]}",
-      Invalid_operator =>$"Invalid operator symbol: '{args[0]}'",
+      Unexpected_term_token => $"Unexpected token in term: {args[0]}",
+      Invalid_operator => $"Invalid operator symbol: '{args[0]}'",
       _ => errNo.ToString().Replace('_', ' ')
     };
-    return new(errNo,msgText, stat);
+    var ex = new CmcException(errNo, msgText, stat);
+    Trace.WriteLine(ex.Message);
+    return ex;
   }
 }
 
@@ -66,14 +69,21 @@ public class CmcException(CmcErrorNumbers errNo, string msg, InputStatus stat) :
 public class CmcMain
 {
 
-  static CmcResult CmollToCs(CmcOptions options)
+  public static void ParseCmoll(CmcOptions options, TextWriter csOutput)
   {
     var source = File.ReadAllText(options.SourceFile);
     var cstate = new CompilerState();
     var scanner = new Scanner(cstate, source, options.SourceFile);
     var tokens = scanner.ScanAllTokens();
     var parser = new Parser(cstate, options, tokens);
+    parser.Parse();
+    csOutput.WriteLine("Nothing here");
 
+  }
+
+  static CmcResult CmollToCs(CmcOptions options)
+  {
+    ParseCmoll(options, TextWriter.Null);
     var result = new CmcResult();
     var fakeCode = @"
 using System;

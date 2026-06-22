@@ -2,8 +2,10 @@
 
 namespace Cmoll.Compiler.Parsing;
 
-record Term : Expr
+record Term 
 {
+  public InputStatus Status = InputStatus.Empty;
+   
   public BaseType Type = BaseType.NotResolved;
   public int Prio = 1;
 
@@ -35,6 +37,12 @@ record Number(string Value) : Term
     this.Type = type;
   }
   public override void BuildCoreString(StringBuilder sb) => sb.Append(Value);
+  public override string ToString() => base.ToString();
+}
+
+record Name(string Text): Term
+{
+  public override void BuildCoreString(StringBuilder sb) => sb.Append(Text);
   public override string ToString() => base.ToString();
 }
 

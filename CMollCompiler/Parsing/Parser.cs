@@ -60,16 +60,26 @@ internal class Parser
     var stat = status ?? Previous.Status;
     throw CmcException.Create(Unexpected_consume, stat, expected, Previous.StringValue);
   }
-  public Expr Parse()
+  public List<Term> Parse()
   {
-    var t = SubTermList(";");
-    return t;
+    var result = new List<Term>();
+    while (true)
+    {
+      if (IsAtEnd())
+        break;
+      var t = SubTermList(".");
+      result.Add(t);
+    }
+    if (Peek.Type == TokenError)
+      throw CmcException.Create(Invalid_token, Peek.Status, Peek.StringValue);
+    return result;
   }
 
   object SingleTermItem(Token tok)
   {
     if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status = Previous.Status };
     if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
+    if (Match(TokenName))  return new Name(tok.StringValue) { Status = Previous.Status };
     if (Match(TokenOperator)) return tok;
     throw CreateTokenException(Unexpected_term_token, tok);
   }
@@ -121,11 +131,12 @@ internal class Parser
   List<object> ReduceTermList(List<object> list)
   {
     if (list.Count <= 1) return list;
-    var result = new List<object>();                  
-    var (idx, oi) = state.OpTable.FindBestMatchOp(list);        
+    var result = new List<object>();
+    var (idx, oi) = state.OpTable.FindBestMatchOp(list);
     var listInputStatus = GetTermPartStatus(list[0]).Union(GetTermPartStatus(list[^1]));
     if (oi == null) throw CmcException.Create(Malformed_term, listInputStatus);
     Term? arg0 = null, arg1 = null;
+    if (oi.IsPrefix) result.AddRange(list[..idx]);
     if (oi.IsInfix || oi.IsPostfix)
     {
       result.AddRange(list[..(idx - 1)]);
@@ -137,7 +148,7 @@ internal class Parser
     {
       if (list[idx + 1] is not Term t) throw CmcException.Create(Malformed_term, listInputStatus);
       if (arg0 == null) arg0 = t; else arg1 = t;
-      if (oi.IsInfix) remIndex++;
+      remIndex++;
     }
     // check the arg prio
     int a0Prio = arg0!.Prio;

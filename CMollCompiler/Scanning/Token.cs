@@ -6,6 +6,7 @@ public struct Token
   public readonly InputStatus Status { get; init; }
   public readonly string StringValue { get; init; }
   public override readonly string ToString() => $"{Type}: {StringValue}";
+  internal Token ChangeType(TokenType newType) => new() { Status = this.Status, Type = newType, StringValue = this.StringValue };
 
 }
 
@@ -15,13 +16,14 @@ public enum TokenType
   TokenLeftParen, TokenRightParen, // ()
   TokenLeftBrace, TokenRightBrace, // {}
   TokenLeftBracket, TokenRightBracket, //[]
-  TokenComma, TokenSemicolon,
+  TokenDot,
+  //TokenComma, TokenSemicolon,
   // Arithmetic op tokens
   TokenOperator,
 
   // Literals.
   TokenName, TokenString, TokenInt, TokenFloat,
-  
+
   TokenComment,
   // Error, EOF
   TokenError, TokenEof

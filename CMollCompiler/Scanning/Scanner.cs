@@ -28,7 +28,7 @@ internal ref struct Scanner
     startLine = line; startCol = col;
     if (IsAtEnd) return MakeToken(TokenEof);
     char c = Advance();
-    if (IsAlpha(c)) return Identifier();
+    if (IsAlpha(c)) return Name();
     if (IsDigit(c)) return Number();
     var tok = c switch
     {
@@ -38,15 +38,16 @@ internal ref struct Scanner
       '}' => MakeToken(TokenRightBrace),
       '[' => MakeToken(TokenLeftBracket),
       ']' => MakeToken(TokenRightBracket),
-      ';' => MakeToken(TokenSemicolon),
-      ',' => MakeToken(TokenComma),
+      '.' => MakeToken(TokenDot),
+      //';' => MakeToken(TokenSemicolon),
+      //',' => MakeToken(TokenComma),
       '/' => Match('/') ? Comment() : OperatorOrError(),
       '"' => ScanString(),
       _ => OpChars.Contains(c) ? OperatorOrError() : ErrorToken($"Unexpected char: '{c}'")
     };
     return tok;
   }
-  static string OpChars = "+-*/=<>!%.";
+  static string OpChars = "+-*/=<>!%.:";
 
   Token OperatorOrError()
   {
@@ -96,13 +97,16 @@ internal ref struct Scanner
       Advance();
       while (IsDigit(Peek())) Advance();
     }
-    return MakeToken(isFloat ? TokenFloat: TokenInt);
+    return MakeToken(isFloat ? TokenFloat : TokenInt);
   }
-  Token Identifier()
+  Token Name()
   {
     while (IsAlpha(Peek()) || IsDigit(Peek()))
       Advance();
-    return MakeToken(TokenName);
+    var name = MakeToken(TokenName);
+    if (state.OpTable.ContainsOperator(name.StringValue))
+      name = name.ChangeType(TokenOperator);
+    return name;
   }
   Token ScanString()
   {

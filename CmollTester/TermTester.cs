@@ -1,4 +1,6 @@
-﻿namespace CmollTester;
+﻿using Cmoll.Compiler.Terms;
+
+namespace CmollTester;
 
 class TermTester
 {

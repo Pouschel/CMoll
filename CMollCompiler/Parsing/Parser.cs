@@ -1,5 +1,6 @@
 ﻿using Cmoll.Compiler.Core;
 using Cmoll.Compiler.Scanning;
+using Cmoll.Compiler.Terms;
 
 namespace Cmoll.Compiler.Parsing;
 

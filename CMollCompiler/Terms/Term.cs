@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Cmoll.Compiler.Parsing;
+namespace Cmoll.Compiler.Terms;
 
 record Term 
 {

@@ -121,8 +121,8 @@ internal class Parser
   List<object> ReduceTermList(List<object> list)
   {
     if (list.Count <= 1) return list;
-    var result = new List<object>();
-    var (idx, oi) = state.OpTable.FindBestMatchOp(list);
+    var result = new List<object>();                  
+    var (idx, oi) = state.OpTable.FindBestMatchOp(list);        
     var listInputStatus = GetTermPartStatus(list[0]).Union(GetTermPartStatus(list[^1]));
     if (oi == null) throw CmcException.Create(Malformed_term, listInputStatus);
     Term? arg0 = null, arg1 = null;

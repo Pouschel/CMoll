@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Cmoll.Compiler.Core;
 
@@ -55,8 +56,16 @@ class OperatorTable
   }
   void Init()
   {
-    Add("*", "yfx", 400);
-    Add("+", "yfx", 500);
+    var fn = Path.Combine(AppContext.BaseDirectory, "Core\\OpList.txt");
+    var lines = File.ReadAllLines(fn);
+    foreach ( var line in lines )
+    {
+      var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+      if (parts.Length != 3) continue;
+      // e.g. Add("*", "yfx", 400);
+      Add(parts[0], parts[1], int.Parse(parts[2]));
+    }
+
   }
   public void Add(string text, string spec, int prio)
   {

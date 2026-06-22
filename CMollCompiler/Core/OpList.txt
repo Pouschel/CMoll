@@ -1,0 +1,13 @@
+
+- fx 200
+
+* yfx 400
+
+// bug + fx 500
++ yfx 500
+- yfx 500
+
+module fx 1199
+
+:- fx 1200
+:- xfx 1200

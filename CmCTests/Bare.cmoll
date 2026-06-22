@@ -1,14 +1,6 @@
-#module bare
+:- module bare.
 
-#impl
-
-main() 
-{ 
-  print("Hallo") 
-}
-
-print(s) :-
-  _cs_("Console.Writeln(<<s>>);")
+main() :- _cs_("Console.Writeln(""Hallo"");").
 
 //? Hallo
 

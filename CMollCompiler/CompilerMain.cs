@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Cmoll.Compiler.CodeGen;
 using CsHelper;
 
 namespace Cmoll.Compiler;
@@ -76,9 +77,9 @@ public class CmcMain
     var scanner = new Scanner(cstate, source, options.SourceFile);
     var tokens = scanner.ScanAllTokens();
     var parser = new Parser(cstate, options, tokens);
-    parser.Parse();
-    csOutput.WriteLine("Nothing here");
-
+    var terms =parser.Parse();
+    var cgen = new CodeGenerator(csOutput);
+    cgen.GenCode(terms);
   }
 
   static CmcResult CmollToCs(CmcOptions options)

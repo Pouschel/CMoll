@@ -27,13 +27,15 @@ internal class Program
 
   }
 
-  static void TestParserOneFile(string fn,  bool compileCs=false)
+  static void TestParserOneFile(string fn, bool compileCs = false)
   {
     CmcOptions options = new()
     {
       SourceFile = fn,
     };
-    CmcMain.ParseCmoll(options, TextWriter.Null);
+    var sw = new StringWriter();
+    CmcMain.ParseCmoll(options, sw);
+    var code = sw.ToString();
 
   }
 }

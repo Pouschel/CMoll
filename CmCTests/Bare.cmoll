@@ -1,7 +1,7 @@
 :- module bare.
 
-main() :- _cs_("Console.Writeln(""Hallo"");").
+main() :- _cs_("Console.Writeln(4);").
 
-//? Hallo
+//? 4
 
 

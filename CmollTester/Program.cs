@@ -16,7 +16,7 @@ internal class Program
     //var s = term?.ToString();
     //PredCompExperiment.PrintSpf(12);
 
-    var fn = @"C:\Code\CMoll\CmCTests\MinNonEmpty.cmoll";
+    var fn = @"C:\Code\CMoll\CmCTests\bare.cmoll";
     TestParserOneFile(fn);
 
     Tester.Start();

@@ -30,6 +30,13 @@ public class CmcResult
 
 }
 
+public static class CmcErrors
+{
+  public static CmcException Invalid_token_error(Token token)
+    => new CmcException(Invalid_token, $"Invalid token '{token.StringValue}'", token.Status);
+}
+
+
 public enum CmcErrorNumbers
 {
   NoErrors = 0,

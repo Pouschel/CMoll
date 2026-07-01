@@ -2,10 +2,10 @@
 
 namespace Cmoll.Compiler.Terms;
 
-record Term 
+record Term
 {
   public InputStatus Status = InputStatus.Empty;
-   
+
   public BaseType Type = BaseType.NotResolved;
   public int Prio = 1;
 
@@ -40,18 +40,60 @@ record Number(string Value) : Term
   public override string ToString() => base.ToString();
 }
 
-record Name(string Text): Term
+record StringTerm(string QuotedValue) : Term
+{
+
+  public string UnquotedValue
+  {
+    get
+    {
+      return QuotedValue.Replace("\"\"", "\"")[1..^1];
+    }
+  }
+
+  public override void BuildCoreString(StringBuilder sb) => sb.Append(QuotedValue);
+  public override string ToString() => base.ToString();
+}
+record Name(string Text) : Term
 {
   public override void BuildCoreString(StringBuilder sb) => sb.Append(Text);
   public override string ToString() => base.ToString();
 }
 
-record ParanTerm(Term inner) :Term
+record ParenTerm(Term? Inner) : Term
 {
   public override void BuildCoreString(StringBuilder sb)
   {
     sb.Append('(');
-    inner.BuildCoreString(sb);
+    Inner?.BuildCoreString(sb);
+    sb.Append(')');
+  }
+  public override string ToString() => base.ToString();
+
+  public Term[] ConvertToArray()
+  {
+    List<Term> res = [];
+    var t = Inner;
+    while (t != null)
+    {
+      if (t is OpTerm ot && ot.op.Symbol == ",")
+      {
+        res.Add(ot.arg1!);
+        t = ot.arg0;
+      }
+      res.Add(t); break;
+    }
+    res.Reverse();
+    return [.. res];
+  }
+}
+
+record CallTerm(Term Func, Term[] Args) : Term
+{
+  public override void BuildCoreString(StringBuilder sb)
+  {
+    sb.Append('(');
+    foreach (Term t in Args) t.BuildCoreString(sb);
     sb.Append(')');
   }
   public override string ToString() => base.ToString();

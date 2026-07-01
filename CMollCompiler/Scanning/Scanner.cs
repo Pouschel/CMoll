@@ -47,7 +47,7 @@ internal ref struct Scanner
     };
     return tok;
   }
-  static string OpChars = "+-*/=<>!%.:";
+  static string OpChars = "+-*/=<>!%.:,";
 
   Token OperatorOrError()
   {

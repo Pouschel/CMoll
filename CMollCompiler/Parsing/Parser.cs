@@ -80,10 +80,12 @@ internal class Parser
   {
     if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status = Previous.Status };
     if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
-    if (Match(TokenName))  return new Name(tok.StringValue) { Status = Previous.Status };
+    if (Match(TokenName)) return new Name(tok.StringValue) { Status = Previous.Status };
     if (Match(TokenOperator)) return tok;
+    if (Match(TokenString)) return new StringTerm(tok.StringValue);
     throw CreateTokenException(Unexpected_term_token, tok);
   }
+
 
   public Term SubTermList(string endTermS)
   {
@@ -94,33 +96,60 @@ internal class Parser
       if (tok.StringValue == endTermS) break;
       if (Match(TokenLeftParen))  // () sub term
       {
-        var innerTerm = SubTermList(")");
-        var pTerm = new ParanTerm(innerTerm)
-        {
-          Status = tok.Status.Union(CurrentInputStatus),
-          Prio = 1
-        };
-        list.Add(pTerm);
+        list.Add(ParseParenTerm());
         continue;
       }
       var st = SingleTermItem(tok);
       list.Add(st);
     }
     Advance();
+    list = CombineCallTerms(list);
     var term = BuildTerm(list);
     term.FixPrio();
     return term;
+  }
+
+  private List<object> CombineCallTerms(List<object> list)
+  {
+    var result = new List<object>(list.Count);
+    for (int i = 0; i < list.Count; i++)
+    {
+      var li = list[i];
+      if (i < list.Count - 1 && li is Name nanme && list[i + 1] is ParenTerm pt)
+      {
+        result.Add(new CallTerm(nanme, pt.ConvertToArray())); 
+        i++;
+      }
+      else
+        result.Add(li);
+    }
+    return result;
+  }
+
+  private ParenTerm ParseParenTerm()
+  {
+    var status = Previous.Status;
+    Term? innerTerm = null;
+    if (!Match(TokenRightParen))
+      innerTerm = SubTermList(")");
+    var pTerm = new ParenTerm(innerTerm)
+    {
+      Status = status.Union(CurrentInputStatus),
+      Prio = 1
+    };
+    return pTerm;
   }
 
   Term BuildTerm(List<object> list)
   {
     while (list.Count > 1)
       list = ReduceTermList(list);
-    if (list.Count == 0) throw CreateTokenException(Invalid_token, Previous);
+    if (list.Count == 0) throw CmcErrors.Invalid_token_error(Previous);
     var item = list[0];
     if (item is not Term term) throw CreateTokenException(Malformed_term, Previous);
     return term;
   }
+
 
   InputStatus GetTermPartStatus(object o)
   {

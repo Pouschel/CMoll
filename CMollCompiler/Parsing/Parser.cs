@@ -105,7 +105,7 @@ internal class Parser
     Advance();
     list = CombineCallTerms(list);
     var term = BuildTerm(list);
-    term.FixPrio();
+    //term.FixPrio();
     return term;
   }
 
@@ -187,7 +187,7 @@ internal class Parser
     dstStatus = dstStatus.Union(((Token)list[idx]).Status);
     if (a0Prio > oi.MaxPrioArg0 || a1Prio > oi.MaxPrioArg1) throw CmcException.Create(Malformed_term, dstStatus);
     // build the final Term
-    var ot = new OpTerm(oi, arg0, arg1) { Status = dstStatus, Prio = oi.Priority };
+    var ot = new OpTerm(oi, arg0, arg1) { Status = dstStatus, Prio = 1 };
     result.Add(ot);
     result.AddRange(list[remIndex..]);
     return result;

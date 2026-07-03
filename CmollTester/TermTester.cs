@@ -28,6 +28,7 @@ class TermTester
 
   public static Term? CheckOkTerm(string termCode, OperatorInfo expectedOp, string endTermSymbol = ".")
   {
+    if (!termCode.TrimEnd().EndsWith(endTermSymbol)) termCode += endTermSymbol;
     var term = CompileOpTerm(termCode, endTermSymbol)!;
     term.NotNullExpected();
     if (term is not OpTerm ot)

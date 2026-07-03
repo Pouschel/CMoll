@@ -120,11 +120,17 @@ class OperatorTable
             if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
             if (op.IsPrefix && i == list.Count - 1) continue;
             if (op.IsPostfix && i == 0) continue;
-            if (op.Priority < minPrio || op.Priority == minPrio && op.IsRightAssoc)
+            if ((op.IsInfix || op.IsBinary) && list[i+1] is Token) continue;
+            if ((op.IsPostfix || op.IsBinary) && list[i - 1] is Token) continue;
+            if (op.Priority > minPrio) continue;
+            if (op.Priority == minPrio)
             {
-              minPrio = op.Priority;
-              resop = op;
+              // right assoc chain -> take op at most right pos
+              // binary an unary op possible -> take the binary
+              if (!op.IsRightAssoc && resop?.Arity == 2) continue;
             }
+            minPrio = op.Priority;
+            resop = op;
           }
           finally
           {

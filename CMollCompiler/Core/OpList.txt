@@ -3,7 +3,7 @@
 
 * yfx 400
 
-// bug + fx 500
++ fx 500
 + yfx 500
 - yfx 500
 

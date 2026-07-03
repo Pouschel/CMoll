@@ -10,6 +10,7 @@ class TermTester
 1+2+3  : + 
 1+2*3  : +
 (1+2)*3 : *
+1,2,3 : ,
 ";
 
   static string ErrTerms = @"
@@ -37,6 +38,18 @@ class TermTester
     return term;
   }
 
+  public static Term? CheckOkTerm(string termCode, string opTerm, string endTermSymbol = ".")
+  {
+    var term = CompileOpTerm(termCode, endTermSymbol)!;
+    term.NotNullExpected();
+    if (term is not OpTerm ot)
+    {
+      Fail(); return null;
+    }
+    ot.op.Symbol.EqualExpected(opTerm);
+    return term;
+  }
+
   public static bool CheckErrorTerm(string termCode, string endTermSymbol = ".")
   {
     Throws<CmcException>(() => CompileOpTerm(termCode,endTermSymbol));
@@ -54,12 +67,9 @@ class TermTester
 
       if (ok)
       {
-        var arity = 2;
         var parts = l.Split(':');
-        if (parts.Length == 3)
-          arity = int.Parse(parts[2].Trim());
-        var opinfo = cstate.OpTable.GetWithArity(parts[1].Trim(), arity);
-        Tester.DoTest(l, () => CheckOkTerm(parts[0], opinfo!) != null);
+        var opt = parts[1].Trim();
+        Tester.DoTest(l, () => CheckOkTerm(parts[0], opt) != null);
       }
       else Tester.DoTest(l, () => CheckErrorTerm(l));
     }

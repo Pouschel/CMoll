@@ -6,6 +6,6 @@ internal class CompilerState
 
   public CompilerState()
   {
-    //OpTable.Add(";", "xfy", 1000);
+    
   }
 }

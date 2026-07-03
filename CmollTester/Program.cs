@@ -15,7 +15,7 @@ internal class Program
     //var term = TermTester.CompileOpTerm("(1+8)*3");
     //var s = term?.ToString();
     //PredCompExperiment.PrintSpf(12);
-
+    
     var fn = @"C:\Code\CMoll\CmCTests\bare.cmoll";
     TestParserOneFile(fn);
 

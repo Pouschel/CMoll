@@ -27,6 +27,9 @@ class OperatorInfo(string text, int priority) : IEquatable<OperatorInfo>
   public bool IsInfix => Arity == 2 && spec[1] == 'f';
   public bool IsPrefix => Arity == 1 && spec[0] == 'f';
   public bool IsPostfix => Arity == 1 && spec[1] == 'f';
+  public bool IsRightAssoc => spec == "xfy";
+  public bool IsLeftAssoc => spec == "yfx";
+  public bool IsNoAssoc => spec == "xfx";
 
   public override bool Equals(object? obj) => Equals(obj as OperatorInfo);
   public override int GetHashCode() => Symbol.GetHashCode() << 3 + Priority + spec.GetHashCode();
@@ -58,7 +61,7 @@ class OperatorTable
   {
     var fn = Path.Combine(AppContext.BaseDirectory, "Core\\OpList.txt");
     var lines = File.ReadAllLines(fn);
-    foreach ( var line in lines )
+    foreach (var line in lines)
     {
       var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
       if (parts.Length != 3) continue;
@@ -98,7 +101,7 @@ class OperatorTable
       if (!data.TryGetValue(tok.StringValue, out var ov))
         throw CmcException.Create(Invalid_operator, tok.Status, tok.StringValue);
       var op = CheckAllowed();
-      if (op?.Priority < minPrio)
+      if (op?.Priority < minPrio || op?.Priority == minPrio && op.IsRightAssoc)
       {
         minPrio = op.Priority;
         bestIndex = i;
@@ -117,7 +120,7 @@ class OperatorTable
             if (op.IsInfix && (i == 0 || i == list.Count - 1)) continue;
             if (op.IsPrefix && i == list.Count - 1) continue;
             if (op.IsPostfix && i == 0) continue;
-            if (op.Priority < minPrio)
+            if (op.Priority < minPrio || op.Priority == minPrio && op.IsRightAssoc)
             {
               minPrio = op.Priority;
               resop = op;

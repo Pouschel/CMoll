@@ -104,13 +104,15 @@ class ParenTerm(Term? inner) : Term
 
 class CallTerm(NameTerm func, Term[] args) : Term
 {
+  public NameTerm Name { get; init; } = func;
+  public Term[] Args { get; init; } = args;
   public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitCallTerm(this);
 
   public override void BuildCoreString(StringBuilder sb)
   {
-    sb.Append(func.Text);
+    sb.Append(Name.Text);
     sb.Append('(');
-    foreach (Term t in args) t.BuildCoreString(sb);
+    foreach (Term t in Args) t.BuildCoreString(sb);
     sb.Append(')');
   }
 }
@@ -149,4 +151,13 @@ class OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
     }
   }
   public override string ToString() => base.ToString();
+}
+
+class ClauseTerm(CallTerm lhs, Term rhs) : Term
+{
+
+  public CallTerm Head { get; init; } = lhs;
+  public Term Rhs { get; init; } = rhs;
+
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitClauseTerm(this);
 }

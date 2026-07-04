@@ -73,6 +73,7 @@ internal class Parser
     }
     if (Peek.Type == TokenError)
       throw CmcException.Create(Invalid_token, Peek.Status, Peek.StringValue);
+    new ClauseBuilder().TransformTerms(result);
     return result;
   }
 
@@ -195,6 +196,18 @@ internal class Parser
 
 }
 
+class ClauseBuilder : TermTransformer
+{
+
+  public override Term VisitOpTerm(OpTerm t)
+  {
+    var op = t.Op;
+    if (op.Symbol != ":-" || op.Arity != 2) return t;
+    if (t.Arg0 is not CallTerm ct)
+      throw CmcErrors.TermError(t.Arg0, "Functor expected");
+    return new ClauseTerm(ct, t.Arg1!);
+  }
+}
 
 
 

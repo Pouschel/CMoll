@@ -38,6 +38,6 @@ internal class Program
     var sw = new StringWriter();
     CmcMain.ParseCmoll(options, sw);
     var code = sw.ToString();
-
+    Console.WriteLine(code);
   }
 }

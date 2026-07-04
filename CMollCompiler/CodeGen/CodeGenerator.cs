@@ -41,10 +41,7 @@ internal class CodeGenerator: TermVisitor<bool>
 
   public void GenCode(List<Term> terms)
   {
-    foreach (var t in terms)
-    {
-      t.Accept(this);
-    }
+    VisitTerms(terms);
     CloseAll();
   }
 
@@ -72,6 +69,18 @@ internal class CodeGenerator: TermVisitor<bool>
   //public override bool VisitCallTerm(CallTerm t) => throw new NotImplementedException();
   //public override bool VisitStringTerm(StringTerm t) => throw new NotImplementedException();
 
+  public override bool VisitClauseTerm(ClauseTerm t)
+  {
+    var head = t.Head;
+    Emit($"public static bool {head.Name.Text}(");
+    // params
+    Emit(")");
+    EmitLine();
+    OpenBrace();
+    EmitLine("return true;");
+    Close();
+    return true;
+  }
 }
 
 static class Term2Code

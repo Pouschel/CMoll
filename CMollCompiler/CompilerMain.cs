@@ -39,6 +39,9 @@ public static class CmcErrors
     => new(Codegen_error, $"Error generating code for term '{t.CoreString}'", t.Status);
   internal static CmcException InternalCompilerError<R>(TermVisitor<R> vis, Term t)
     => new(Internal_error, $"Internal error phase: {vis.GetType().Name}; term: '{t.CoreString}'", t.Status);
+
+  internal static CmcException TermError(Term t, string message)
+    => new(Term_error, $"Error in term '{t.CoreString}': {message}", t.Status);
 }
 
 
@@ -49,7 +52,7 @@ public enum CmcErrorNumbers
   Invalid_token,
   Unexpected_consume,
   Unexpected_term_token,
-  Term_expected,
+  Term_error,
   Malformed_term,
   Invalid_operator,
   Codegen_error,

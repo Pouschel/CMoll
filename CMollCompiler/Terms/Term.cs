@@ -2,12 +2,14 @@
 
 namespace Cmoll.Compiler.Terms;
 
-class Term
+abstract class Term
 {
   public InputStatus Status = InputStatus.Empty;
 
   public BaseType Type = BaseType.NotResolved;
   public int Prio = 1;
+
+  public abstract R Accept<R>(TermVisitor<R> visitor);
 
   public virtual void BuildCoreString(StringBuilder sb)
   {
@@ -33,20 +35,21 @@ class Term
   
 }
 
-class Number(string value) : Term
+class NumberTerm(string value) : Term
 {
-  public Number(string value, CsType type) : this(value)
+  public NumberTerm(string value, CsType type) : this(value)
   {
     this.Type = type;
   }
   public string Value => value;
+
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitNumberTerm(this);
   public override void BuildCoreString(StringBuilder sb) => sb.Append(value);
  
 }
 
 class StringTerm(string quotedValue) : Term
 {
-
   public string UnquotedValue
   {
     get
@@ -55,22 +58,26 @@ class StringTerm(string quotedValue) : Term
     }
   }
 
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitStringTerm(this);
   public override void BuildCoreString(StringBuilder sb) => sb.Append(quotedValue);
   public override string ToString() => base.ToString();
 }
-class Name(string text) : Term
+class NameTerm(string text) : Term
 {
   public string Text => text;
+
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitNameTerm(this);
   public override void BuildCoreString(StringBuilder sb) => sb.Append(text);
   public override string ToString() => base.ToString();
 }
 
-class ParenTerm(Term? Inner) : Term
+class ParenTerm(Term? inner) : Term
 {
+  public Term Inner => inner!;
   public override void BuildCoreString(StringBuilder sb)
   {
     sb.Append('(');
-    Inner?.BuildCoreString(sb);
+    inner?.BuildCoreString(sb);
     sb.Append(')');
   }
   public override string ToString() => base.ToString();
@@ -78,7 +85,7 @@ class ParenTerm(Term? Inner) : Term
   public Term[] ConvertToArray()
   {
     List<Term> res = [];
-    var t = Inner;
+    var t = inner;
     while (t != null)
     {
       if (t is OpTerm ot && ot.Op.Symbol == ",")
@@ -91,10 +98,14 @@ class ParenTerm(Term? Inner) : Term
     res.Reverse();
     return [.. res];
   }
+
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitParenTerm(this);
 }
 
-class CallTerm(Name func, Term[] args) : Term
+class CallTerm(NameTerm func, Term[] args) : Term
 {
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitCallTerm(this);
+
   public override void BuildCoreString(StringBuilder sb)
   {
     sb.Append(func.Text);
@@ -102,7 +113,6 @@ class CallTerm(Name func, Term[] args) : Term
     foreach (Term t in args) t.BuildCoreString(sb);
     sb.Append(')');
   }
-  
 }
 
 class OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
@@ -110,6 +120,8 @@ class OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
   public OperatorInfo Op => op;
   public Term Arg0 => arg0;
   public Term? Arg1 => arg1;
+
+  public override R Accept<R>(TermVisitor<R> visitor) => visitor.VisitOpTerm(this);
 
   public override void BuildCoreString(StringBuilder sb)
   {

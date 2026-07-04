@@ -78,9 +78,9 @@ internal class Parser
 
   object SingleTermItem(Token tok)
   {
-    if (Match(TokenInt)) return new Number(tok.StringValue, new(typeof(int))) { Status = Previous.Status };
-    if (Match(TokenFloat)) return new Number(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
-    if (Match(TokenName)) return new Name(tok.StringValue) { Status = Previous.Status };
+    if (Match(TokenInt)) return new NumberTerm(tok.StringValue, new(typeof(int))) { Status = Previous.Status };
+    if (Match(TokenFloat)) return new NumberTerm(tok.StringValue, new(typeof(double))) { Status = Previous.Status };
+    if (Match(TokenName)) return new NameTerm(tok.StringValue) { Status = Previous.Status };
     if (Match(TokenOperator)) return tok;
     if (Match(TokenString)) return new StringTerm(tok.StringValue);
     throw CreateTokenException(Unexpected_term_token, tok);
@@ -115,9 +115,9 @@ internal class Parser
     for (int i = 0; i < list.Count; i++)
     {
       var li = list[i];
-      if (i < list.Count - 1 && li is Name nanme && list[i + 1] is ParenTerm pt)
+      if (i < list.Count - 1 && li is NameTerm nanme && list[i + 1] is ParenTerm pt)
       {
-        result.Add(new CallTerm(nanme, pt.ConvertToArray())); 
+        result.Add(new CallTerm(nanme, pt.ConvertToArray()) { Status = nanme.Status.Union(pt.Status) });
         i++;
       }
       else
@@ -134,7 +134,7 @@ internal class Parser
       innerTerm = SubTermList(")");
     var pTerm = new ParenTerm(innerTerm)
     {
-      Status = status.Union(CurrentInputStatus),
+      Status = status.Union(Previous.Status),
       Prio = 1
     };
     return pTerm;

@@ -4,7 +4,7 @@ using Cmoll.Compiler.Terms;
 
 namespace Cmoll.Compiler.CodeGen;
 
-internal class CodeGenerator
+internal class CodeGenerator: TermVisitor<bool>
 {
   public IndentedTextWriter tw;
 
@@ -34,23 +34,51 @@ internal class CodeGenerator
     while (openUnits.Count > 0) Close();
   }
   public void EmitLine(string code = "") => tw.WriteLine(code);
-  public void Emit(string code) => tw.Write(code);
+  public bool Emit(string code)
+  {
+    tw.Write(code); return true;
+  }
 
   public void GenCode(List<Term> terms)
   {
     foreach (var t in terms)
     {
-      t.GenCode(this);
+      t.Accept(this);
     }
     CloseAll();
   }
+
+  public override bool VisitNumberTerm(NumberTerm t) => this.Emit(t.Value);
+
+  public override bool VisitNameTerm(NameTerm t) => this.Emit(t.Text);
+  public override bool VisitOpTerm(OpTerm t)
+  {
+    switch (t.Op.Symbol)
+    {
+      case ":-":
+        t.Arg0.Accept(this);
+        break;
+      case "module":
+        CloseAll();
+        Emit($"public static partial class ");
+        t.Arg0.Accept(this);
+        EmitLine();
+        OpenBrace();
+        break;
+      default: throw new NotImplementedException();
+    }
+    return true;
+  }
+  //public override bool VisitCallTerm(CallTerm t) => throw new NotImplementedException();
+  //public override bool VisitStringTerm(StringTerm t) => throw new NotImplementedException();
+
 }
 
 static class Term2Code
 {
-  public static void GenCode(this Number t, CodeGenerator cgen) => cgen.Emit(t.Value);
+  public static void GenCode(this NumberTerm t, CodeGenerator cgen) => cgen.Emit(t.Value);
 
-  public static void GenCode(this Name t, CodeGenerator cgen) => cgen.Emit(t.Text);
+  public static void GenCode(this NameTerm t, CodeGenerator cgen) => cgen.Emit(t.Text);
 
   public static bool GenCode(this OpTerm t, CodeGenerator cgen)
   {
@@ -75,8 +103,8 @@ static class Term2Code
   {
     switch (t)
     {
-      case Name name: name.GenCode(cgen); break;
-      case Number n: n.GenCode(cgen); break;
+      case NameTerm name: name.GenCode(cgen); break;
+      case NumberTerm n: n.GenCode(cgen); break;
       case OpTerm ot: ot.GenCode(cgen); break;
       default: throw CmcErrors.CodegenError(t);
     }

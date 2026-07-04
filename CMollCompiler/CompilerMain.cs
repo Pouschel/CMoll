@@ -37,6 +37,8 @@ public static class CmcErrors
     => new CmcException(Invalid_token, $"Invalid token '{token.StringValue}'", token.Status);
   internal static CmcException CodegenError(Term t)
     => new(Codegen_error, $"Error generating code for term '{t.CoreString}'", t.Status);
+  internal static CmcException InternalCompilerError<R>(TermVisitor<R> vis, Term t)
+    => new(Internal_error, $"Internal error phase: {vis.GetType().Name}; term: '{t.CoreString}'", t.Status);
 }
 
 
@@ -51,6 +53,7 @@ public enum CmcErrorNumbers
   Malformed_term,
   Invalid_operator,
   Codegen_error,
+  Internal_error,
   Csharp_compiler_error = 9000,
 }
 

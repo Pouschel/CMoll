@@ -35,7 +35,7 @@ class TermTester
     {
       Fail(); return null;
     }
-    ot.op.EqualExpected(expectedOp);
+    ot.Op.EqualExpected(expectedOp);
     return term;
   }
 
@@ -47,7 +47,7 @@ class TermTester
     {
       Fail(); return null;
     }
-    ot.op.Symbol.EqualExpected(opTerm);
+    ot.Op.Symbol.EqualExpected(opTerm);
     return term;
   }
 

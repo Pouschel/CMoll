@@ -2,7 +2,7 @@
 
 namespace Cmoll.Compiler.Terms;
 
-record Term
+class Term
 {
   public InputStatus Status = InputStatus.Empty;
 
@@ -14,11 +14,18 @@ record Term
   }
   public override string ToString()
   {
-    var sb = new StringBuilder();
-    BuildCoreString(sb);
-    return $"{sb} {Type} {Prio}";
+    return $"{CoreString} {Type} {Prio}";
   }
 
+  public string CoreString
+  {
+    get
+    {
+      var sb = new StringBuilder();
+      BuildCoreString(sb);
+      return sb.ToString();
+    }
+  }
   /// <summary>
   /// Adapts the priority to the args
   /// (braces did set it to 1, so we will correct it here)
@@ -26,21 +33,22 @@ record Term
   public virtual void FixPrio() { }
 }
 
-record Literal : Term
+class Literal : Term
 {
 }
 
-record Number(string Value) : Term
+class Number(string value) : Term
 {
   public Number(string value, CsType type) : this(value)
   {
     this.Type = type;
   }
-  public override void BuildCoreString(StringBuilder sb) => sb.Append(Value);
+  public string Value => value;
+  public override void BuildCoreString(StringBuilder sb) => sb.Append(value);
   public override string ToString() => base.ToString();
 }
 
-record StringTerm(string QuotedValue) : Term
+class StringTerm(string QuotedValue) : Term
 {
 
   public string UnquotedValue
@@ -54,13 +62,14 @@ record StringTerm(string QuotedValue) : Term
   public override void BuildCoreString(StringBuilder sb) => sb.Append(QuotedValue);
   public override string ToString() => base.ToString();
 }
-record Name(string Text) : Term
+class Name(string text) : Term
 {
-  public override void BuildCoreString(StringBuilder sb) => sb.Append(Text);
+  public string Text => text;
+  public override void BuildCoreString(StringBuilder sb) => sb.Append(text);
   public override string ToString() => base.ToString();
 }
 
-record ParenTerm(Term? Inner) : Term
+class ParenTerm(Term? Inner) : Term
 {
   public override void BuildCoreString(StringBuilder sb)
   {
@@ -76,10 +85,10 @@ record ParenTerm(Term? Inner) : Term
     var t = Inner;
     while (t != null)
     {
-      if (t is OpTerm ot && ot.op.Symbol == ",")
+      if (t is OpTerm ot && ot.Op.Symbol == ",")
       {
-        res.Add(ot.arg1!);
-        t = ot.arg0;
+        res.Add(ot.Arg1!);
+        t = ot.Arg0;
       }
       res.Add(t); break;
     }
@@ -88,19 +97,24 @@ record ParenTerm(Term? Inner) : Term
   }
 }
 
-record CallTerm(Term Func, Term[] Args) : Term
+class CallTerm(Name func, Term[] args) : Term
 {
   public override void BuildCoreString(StringBuilder sb)
   {
+    sb.Append(func.Text);
     sb.Append('(');
-    foreach (Term t in Args) t.BuildCoreString(sb);
+    foreach (Term t in args) t.BuildCoreString(sb);
     sb.Append(')');
   }
-  public override string ToString() => base.ToString();
+  
 }
 
-record OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
+class OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
 {
+  public OperatorInfo Op => op;
+  public Term Arg0 => arg0;
+  public Term? Arg1 => arg1;
+
   public override void BuildCoreString(StringBuilder sb)
   {
     int argsNr = 0;

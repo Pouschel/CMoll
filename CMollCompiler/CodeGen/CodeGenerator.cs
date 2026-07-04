@@ -54,15 +54,15 @@ static class Term2Code
 
   public static bool GenCode(this OpTerm t, CodeGenerator cgen)
   {
-    switch (t.op.Symbol)
+    switch (t.Op.Symbol)
     {
       case ":-":
-        t.arg0.GenCode(cgen);
+        t.Arg0.GenCode(cgen);
         break;
       case "module":
         cgen.CloseAll();
         cgen.Emit($"public static partial class ");
-        t.arg0.GenCode(cgen);
+        t.Arg0.GenCode(cgen);
         cgen.EmitLine();
         cgen.OpenBrace();
         break;
@@ -78,7 +78,7 @@ static class Term2Code
       case Name name: name.GenCode(cgen); break;
       case Number n: n.GenCode(cgen); break;
       case OpTerm ot: ot.GenCode(cgen); break;
-      default: throw new NotImplementedException();
+      default: throw CmcErrors.CodegenError(t);
     }
 
   }

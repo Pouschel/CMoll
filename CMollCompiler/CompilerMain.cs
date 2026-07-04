@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Cmoll.Compiler.CodeGen;
+using Cmoll.Compiler.Terms;
 using CsHelper;
 
 namespace Cmoll.Compiler;
@@ -34,6 +35,8 @@ public static class CmcErrors
 {
   public static CmcException Invalid_token_error(Token token)
     => new CmcException(Invalid_token, $"Invalid token '{token.StringValue}'", token.Status);
+  internal static CmcException CodegenError(Term t)
+    => new(Codegen_error, $"Error generating code for term '{t.CoreString}'", t.Status);
 }
 
 
@@ -47,6 +50,7 @@ public enum CmcErrorNumbers
   Term_expected,
   Malformed_term,
   Invalid_operator,
+  Codegen_error,
   Csharp_compiler_error = 9000,
 }
 
@@ -84,7 +88,7 @@ public class CmcMain
     var scanner = new Scanner(cstate, source, options.SourceFile);
     var tokens = scanner.ScanAllTokens();
     var parser = new Parser(cstate, options, tokens);
-    var terms =parser.Parse();
+    var terms = parser.Parse();
     var cgen = new CodeGenerator(csOutput);
     cgen.GenCode(terms);
   }

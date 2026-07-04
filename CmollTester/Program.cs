@@ -19,7 +19,7 @@ internal class Program
     TermTester.CheckOkTerm("1 * +2", "*");
 
     var fn = @"C:\Code\CMoll\CmCTests\bare.cmoll";
-    //TestParserOneFile(fn);
+    TestParserOneFile(fn);
 
     Tester.Start();
     TermTester.TestAllTerms();

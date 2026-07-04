@@ -10,7 +10,8 @@ class TermTester
 1+2+3  : + 
 1+2*3  : +
 (1+2)*3 : *
-1,2,3 : ,
+1,2,3   : ,
+1 * +2  : *
 ";
 
   static string ErrTerms = @"

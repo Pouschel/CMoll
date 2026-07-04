@@ -30,11 +30,7 @@ class Term
   /// Adapts the priority to the args
   /// (braces did set it to 1, so we will correct it here)
   /// </summary>
-  public virtual void FixPrio() { }
-}
-
-class Literal : Term
-{
+  
 }
 
 class Number(string value) : Term
@@ -45,21 +41,21 @@ class Number(string value) : Term
   }
   public string Value => value;
   public override void BuildCoreString(StringBuilder sb) => sb.Append(value);
-  public override string ToString() => base.ToString();
+ 
 }
 
-class StringTerm(string QuotedValue) : Term
+class StringTerm(string quotedValue) : Term
 {
 
   public string UnquotedValue
   {
     get
     {
-      return QuotedValue.Replace("\"\"", "\"")[1..^1];
+      return quotedValue.Replace("\"\"", "\"")[1..^1];
     }
   }
 
-  public override void BuildCoreString(StringBuilder sb) => sb.Append(QuotedValue);
+  public override void BuildCoreString(StringBuilder sb) => sb.Append(quotedValue);
   public override string ToString() => base.ToString();
 }
 class Name(string text) : Term
@@ -140,12 +136,5 @@ class OpTerm(OperatorInfo op, Term arg0, Term? arg1 = null) : Term
       if (arg.Prio > cmpPrio) sb.Append(')');
     }
   }
-  public override void FixPrio()
-  {
-    arg0.FixPrio(); arg1?.FixPrio();
-    //if (arg0.Prio > this.Prio || arg1?.Prio > this.Prio) throw new NotSupportedException();
-    this.Prio = op.Priority;
-  }
-
   public override string ToString() => base.ToString();
 }
